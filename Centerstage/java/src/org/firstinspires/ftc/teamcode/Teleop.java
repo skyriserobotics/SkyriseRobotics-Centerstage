@@ -6,21 +6,18 @@ import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.teamcode.common.RobotConfig;
 
-
 @TeleOp
 public class Teleop extends RobotConfig {
     private double drive;
     private double strafe;
     private double turning;
 
-    private double turnOfArm;
-    
+    private double turnOfArm;    
     
     @Override
     public void runOpMode() {
 
-        this.initializeHardware();
-        
+        this.initializeHardware();      
 
         telemetry.addData("Status", "Initialized");
         telemetry.update();
@@ -28,17 +25,13 @@ public class Teleop extends RobotConfig {
         waitForStart();
 
         while (opModeIsActive()) {
-
+            
             telemetry.addData("Status", "Running");
             telemetry.update();
 
             drive = squareInputWithSign(gamepad1.left_stick_y);
             strafe = squareInputWithSign(gamepad1.left_stick_x);
             turning = squareInputWithSign(-gamepad1.right_stick_x);
-            // telemetry.addData("Power values", "D/S/R"+drive);
-            // telemetry.addData("Power values", "D/S/R"+"----"+strafe);
-            telemetry.addData("Power values", "D/S/R"+"-"+turning);
-            telemetry.update();
             
             frontleftdrive.setPower((drive + strafe - turning));
             frontrightdrive.setPower((drive - strafe + turning));
@@ -61,12 +54,15 @@ public class Teleop extends RobotConfig {
             if (gamepad2.b) {
                 this.rotateServo(45);
             }
+            
             if (gamepad2.y) {
-            this.rotateServo(-90);
-            }  
-            if (gamepad2.a) {
-            this.rotateServo(180);
+                this.rotateServo(-90);
             }
+            
+            if (gamepad2.a) {
+                this.rotateServo(180);
+            }
+            
             //launcher  
             if(gamepad1.a) {
                this.launchRest();
@@ -76,7 +72,6 @@ public class Teleop extends RobotConfig {
             }
         }
     }
-
    
     private double squareInputWithSign(double input) {
         double output = input * input;
@@ -84,8 +79,6 @@ public class Teleop extends RobotConfig {
             output *= -1;
         }
         return output;
-    }
-    
-    
+    }    
 }
 
