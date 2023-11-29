@@ -5,7 +5,7 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import org.firstinspires.ftc.teamcode.common.RobotConfig;
 
 @Autonomous
-public class Auto extends RobotConfig {
+public class AutoBlue extends RobotConfig {
   @Override
   public void runOpMode() throws InterruptedException {
     
@@ -15,8 +15,8 @@ public class Auto extends RobotConfig {
     if (opModeIsActive()) {      
       servoClose();      
       forward(22);
-      turnLeft(40);
-      strafeLeft(20);  
+      turnRight(40);
+      strafeRight(20);  
       backward(6);
       autoArmUp();
       autoArmDown();

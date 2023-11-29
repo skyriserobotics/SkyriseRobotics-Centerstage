@@ -8,12 +8,10 @@ import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Servo;
-import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
-
 
 public abstract class RobotConfig extends LinearOpMode {
     // drive train motor 5203 series - https://www.gobilda.com/5203-series-yellow-jacket-planetary-gear-motor-19-2-1-ratio-24mm-length-8mm-rex-shaft-312-rpm-3-3-5v-encoder/
@@ -28,8 +26,6 @@ public abstract class RobotConfig extends LinearOpMode {
     protected DcMotor frontrightdrive;
     protected DcMotor backleftdrive;
     protected DcMotor backrightdrive;
-    
-    // protected DcMotor arm; 
 
     protected DcMotor slidePulley;
     protected AnalogInput potentiometer;
@@ -64,11 +60,6 @@ public abstract class RobotConfig extends LinearOpMode {
         currentVoltage = potentiometer.getVoltage();
         telemetry.addData("Current Voltage from potentiometer", currentVoltage);
         telemetry.update();
-        // example to initilize a new motor
-        // motorExample = hardwareMap.get(DcMotor.class, "motorExample");
-        
-        // Example to initilize a new servo
-        // servoExample = hardwareMap.get(Servo.class, "servoExample");
 
         clawLeftServo = hardwareMap.get(Servo.class,"clawleftservo");
         clawRightServo = hardwareMap.get(Servo.class,"clawrightservo");
@@ -79,12 +70,6 @@ public abstract class RobotConfig extends LinearOpMode {
         backleftdrive.setDirection(DcMotor.Direction.FORWARD);
         frontrightdrive.setDirection(DcMotor.Direction.REVERSE);
         backrightdrive.setDirection(DcMotor.Direction.REVERSE);
-
-        // Set direction example for motors
-        // motorExample.setDirection(DcMotor.Direction.REVERSE);
-
-        // Set direction example for servos
-        // servoExample.setDirection(Servo.Direction.REVERSE);
         
         setModeForWheelMotors(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         setModeForWheelMotors(DcMotor.RunMode.RUN_USING_ENCODER);
@@ -133,105 +118,52 @@ public abstract class RobotConfig extends LinearOpMode {
 
     private void waitUntilMotorsBusy() {
         while (frontleftdrive.isBusy() && frontrightdrive.isBusy() && backleftdrive.isBusy() && backrightdrive.isBusy()) {
-            telemetry.addData("encoder-front-left", frontleftdrive.getCurrentPosition());
-            telemetry.addData("encoder-front-right", frontrightdrive.getCurrentPosition());
-            telemetry.addData("encoder-back-left", backleftdrive.getCurrentPosition());
-            telemetry.addData("encoder-back-right", frontrightdrive.getCurrentPosition());
-            telemetry.update();
+//            telemetry.addData("encoder-front-left", frontleftdrive.getCurrentPosition());
+//            telemetry.addData("encoder-front-right", frontrightdrive.getCurrentPosition());
+//            telemetry.addData("encoder-back-left", backleftdrive.getCurrentPosition());
+//            telemetry.addData("encoder-back-right", frontrightdrive.getCurrentPosition());
+//            telemetry.update();
             idle();
         }
+    }
+    
+    protected void forward(int distance) {
+        distance = distance * ticks;
+        setTargetPositionForWheelMotors(-distance, -distance, -distance, -distance);
+        setModeForWheelMotors(DcMotor.RunMode.RUN_TO_POSITION);
+        backwardPower();
+        waitUntilMotorsBusy();
+        stopPower();
+        sleep(1000);
+    }
+    
+    private void backwardPower() {
+        setWheelsPower(-wheelpower,-wheelpower,-wheelpower,-wheelpower);
+    }
+    
+    protected void backward(int distance) {
+        distance = distance * ticks;
+        setModeForWheelMotors(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        setModeForWheelMotors(DcMotor.RunMode.RUN_USING_ENCODER);
+        setTargetPositionForWheelMotors(distance, distance, distance, distance);
+        setModeForWheelMotors(DcMotor.RunMode.RUN_TO_POSITION);
+        forwardPower();
+        waitUntilMotorsBusy();
+        stopPower();
+        sleep(1000);
     }
 
     private void forwardPower() {
         setWheelsPower(wheelpower,wheelpower,wheelpower,wheelpower);
-    //   setWheelsPower(0.3,0.3,0.3,0.3);
     }
-
-    // private void forwardFastPower(double power) {
-    //     setWheelsPower(-power,-power,-power,-power);
-    // }
-
-    private void backwardPower() {
-        setWheelsPower(-wheelpower,-wheelpower,-wheelpower,-wheelpower);
-    }
-
-
-    // private void rightPower() {
-    //     setWheelsPower(wheelpower,-wheelpower,wheelpower,-wheelpower);
-    // }
-
-    // private void strafeRightPower() {
-    //     setWheelsPower(-wheelpower,wheelpower,wheelpower,-wheelpower);
-    // }
-
-    private void stopPower() {
-        setWheelsPower(0,0,0,0);
-    }
-
-
-
-
-    protected void Backward(int distance) {
-        distance = distance * ticks;
-        setModeForWheelMotors(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        setModeForWheelMotors(DcMotor.RunMode.RUN_USING_ENCODER);
-        
-        setTargetPositionForWheelMotors(distance, distance, distance, distance);
-
-        setModeForWheelMotors(DcMotor.RunMode.RUN_TO_POSITION);
-
-        forwardPower();
-
-        waitUntilMotorsBusy();
-
-        stopPower();
-        
-        sleep(1000);
-        // distance = distance * ticks;
-        // setModeForWheelMotors(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        // // setModeForWheelMotors(DcMotor.RunMode.RUN_USING_ENCODER);
-
-        // setTargetPositionForWheelMotors(distance, distance, distance, distance);
-
-        // setModeForWheelMotors(DcMotor.RunMode.RUN_TO_POSITION);
-        
-        // forwardPower();
-
-        // waitUntilMotorsBusy();
-
-        // stopPower();
-        // setModeForWheelMotors(DcMotor.RunMode.RUN_USING_ENCODER);
-        // sleep(1000);
-    }
-
-    protected void Forward(int distance) {
-        distance = distance * ticks;
-
-        setTargetPositionForWheelMotors(-distance, -distance, -distance, -distance);
-
-        setModeForWheelMotors(DcMotor.RunMode.RUN_TO_POSITION);
-
-        backwardPower();
-
-        waitUntilMotorsBusy();
-
-        stopPower();
-        
-        sleep(1000);
-    }
-
     
-    protected void TurnLeftAngel(int angle) {
-        angle = angle * ticks;
-        // setModeForWheelMotors(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-       
-        setTargetPositionForWheelMotors(-angle,angle,-angle,angle);
+    protected void turnLeft(int distance) {
+        distance = distance * ticks;
+        setTargetPositionForWheelMotors(-distance, distance,-distance, distance);
         setModeForWheelMotors(DcMotor.RunMode.RUN_TO_POSITION);
-           
         leftPower();
         waitUntilMotorsBusy();
         stopPower();
-        // setModeForWheelMotors(DcMotor.RunMode.RUN_USING_ENCODER);
         sleep(1000);
     }
     
@@ -239,100 +171,75 @@ public abstract class RobotConfig extends LinearOpMode {
         // setWheelsPower(wheelpower,wheelpower,wheelpower,wheelpower);
         setWheelsPower(0.01,1.0,0.01,1.0);
     }
-
-    protected void TurnLeft(int distance) {
-        distance = distance * ticks;
-
-        setTargetPositionForWheelMotors(distance, distance, distance, distance);
-
-     //   setModeForWheelMotors(DcMotor.RunMode.RUN_TO_POSITION);
-        frontleftdrive.setDirection(DcMotor.Direction.FORWARD);
-        backleftdrive.setDirection(DcMotor.Direction.FORWARD);
-        frontrightdrive.setDirection(DcMotor.Direction.FORWARD);
-        backrightdrive.setDirection(DcMotor.Direction.FORWARD);
-        leftPower();
-
-        waitUntilMotorsBusy();
-        stopPower();
-        sleep(1000);
-    }
-    // protected void FastForward(int distance, int power) {
-    //     distance = distance * ticks;
-
-    //     setTargetPositionForWheelMotors(-distance, -distance, -distance, -distance);
-
-    //     setModeForWheelMotors(DcMotor.RunMode.RUN_TO_POSITION);
-
-    //     forwardFastPower(power); // technically backward but yeah whatever
-
-    //     waitUntilMotorsBusy();
-
-    //     stopPower();
-    //     setModeForWheelMotors(DcMotor.RunMode.RUN_USING_ENCODER);
-    //     sleep(1000);
-    // }
-
-
     
+     protected void turnRight(int distance) {
+         distance = distance * ticks;
+         setTargetPositionForWheelMotors(distance, -distance, distance, -distance);
+         setModeForWheelMotors(DcMotor.RunMode.RUN_TO_POSITION);
+         rightPower();
+         waitUntilMotorsBusy();
+         stopPower();
+         sleep(1000);
+     }
 
-    // protected void TurnRight(int distance) {
-    //     distance = distance * ticks;
-
-    //     setTargetPositionForWheelMotors(distance, -distance, distance, -distance);
-
-    //     setModeForWheelMotors(DcMotor.RunMode.RUN_TO_POSITION);
-
-    //     rightPower();
-
-    //     waitUntilMotorsBusy();
-
-    //     stopPower();
-    //     setModeForWheelMotors(DcMotor.RunMode.RUN_USING_ENCODER);
-    //     sleep(1000);
-    // }
+     private void rightPower() {
+         //setWheelsPower(wheelpower,-wheelpower,wheelpower,-wheelpower);
+         setWheelsPower(1.0,0.01,1.0,0.01);
+     } 
+    
+    protected void strafeLeft(int distance) {
+        distance = distance * ticks;
+        setTargetPositionForWheelMotors(distance,-distance,-distance,distance);
+        setModeForWheelMotors(DcMotor.RunMode.RUN_TO_POSITION);
+        strafeLeftPower();
+        waitUntilMotorsBusy();
+        stopPower();        
+        sleep(1000);
+    }    
 
     private void strafeLeftPower() {
         //setWheelsPower(wheelpower,-wheelpower,-wheelpower,wheelpower);
         setWheelsPower(0.7,-0.7,-0.7,0.7);
     }
     
-    protected void StrafeLeft(int distance) {
-        distance = distance * ticks;
+     protected void strafeRight(int distance) {
+         distance = distance * ticks;
+         setTargetPositionForWheelMotors(-distance, distance, distance, -distance);
+         setModeForWheelMotors(DcMotor.RunMode.RUN_TO_POSITION);
+         strafeRightPower();
+         waitUntilMotorsBusy();
+         stopPower();         
+         sleep(1000);
+     }
 
-        setTargetPositionForWheelMotors(distance,-distance,-distance,distance);
-
-        setModeForWheelMotors(DcMotor.RunMode.RUN_TO_POSITION);
-
-        strafeLeftPower();
-
-        waitUntilMotorsBusy();
-
-        stopPower();
-        // setModeForWheelMotors(DcMotor.RunMode.RUN_USING_ENCODER);
-        sleep(1000);
-    }
-
-    // protected void StrafeRight(int distance) {
+     private void strafeRightPower() {
+         //setWheelsPower(-wheelpower,wheelpower,wheelpower,-wheelpower);
+         setWheelsPower(-0.7,0.7,0.7,-0.7);
+     }
+    
+    private void stopPower() {
+        setWheelsPower(0,0,0,0);
+    }   
+    
+    // protected void fastForward(int distance, int power) {
     //     distance = distance * ticks;
-
-    //     setTargetPositionForWheelMotors(-distance, distance, distance, -distance);
-
+    //     setTargetPositionForWheelMotors(-distance, -distance, -distance, -distance);
     //     setModeForWheelMotors(DcMotor.RunMode.RUN_TO_POSITION);
-
-    //     strafeRightPower();
-
+    //     forwardFastPower(power); // technically backward but yeah whatever
     //     waitUntilMotorsBusy();
-
     //     stopPower();
     //     setModeForWheelMotors(DcMotor.RunMode.RUN_USING_ENCODER);
     //     sleep(1000);
     // }
+    
+    // private void forwardFastPower(double power) {
+    //     setWheelsPower(-power,-power,-power,-power);
+    // }    
 
     // private double getAngle() {
     //     Orientation orientation = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
     //     return orientation.firstAngle;
     // }
-
 
     // private void runWithoutEncoders() {
     //     setModeForWheelMotors(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
@@ -361,9 +268,8 @@ public abstract class RobotConfig extends LinearOpMode {
         else if (180==posn){ // 180 degrees
             balanceServo.setPosition(0.9);
         } else {
-             telemetry.
-             addData("BaServo Position is  ", balanceServo.getPosition());
-        telemetry.update();
+            telemetry.addData("BaServo Position is  ", balanceServo.getPosition());
+            telemetry.update();
             balanceServo.setPosition(0.65);
         }
     }
@@ -372,8 +278,7 @@ public abstract class RobotConfig extends LinearOpMode {
     protected void launch() {//y
         launchServo.setDirection(Servo.Direction.FORWARD);
         launchServo.setPosition(0.6);
-    }
-    
+    }    
     
     //launcherServo - rest position
     protected void launchRest() {
@@ -381,47 +286,28 @@ public abstract class RobotConfig extends LinearOpMode {
         launchServo.setPosition(0.0);
     }
     
-    protected void armUp(){
-        //currentVoltage = potentiometer.getVoltage();
-        /*if (armStartingPosition == 0) {
-            armStartingPosition = slidePulley.getCurrentPosition();
-        }*/
-        armPosition = slidePulley.getCurrentPosition();
-        telemetry.addData("starting arm Position is  ", armPosition);
-        telemetry.update();
-        
+    protected void armUp(){        
+        armPosition = slidePulley.getCurrentPosition();        
         slidePulley.setTargetPosition(armPosition + 100);
         slidePulley.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         slidePulley.setPower(0.2);
     }
     
     protected void armDown() {
-        // slidePulley.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-         /*currentVoltage = potentiometer.getVoltage();
-         if(currentVoltage > 0.4) {
-            slidePulley.setTargetPosition(0);
-            slidePulley.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-            slidePulley.setPower(0.0); 
-         } */
         armPosition = slidePulley.getCurrentPosition();
-        slidePulley.setTargetPosition(armPosition - 20);
-        //slidePulley.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        slidePulley.setTargetPosition(armPosition - 20);        
         slidePulley.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         slidePulley.setPower(-0.4);
     }
     
-    protected void autoArmUp(){
-        
+    protected void autoArmUp(){        
         servoClose();
         
         slidePulley.setDirection(DcMotor.Direction.FORWARD);
         slidePulley.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         slidePulley.setTargetPosition(slidePulley.getCurrentPosition()+ 750);
         slidePulley.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        slidePulley.setPower(-0.2);
-        telemetry.addData("starting arm Movement is  ", slidePulley.getCurrentPosition());
-        telemetry.update();
-        
+        slidePulley.setPower(-0.2);        
        
         while (slidePulley.isBusy()) {
             idle();
@@ -429,14 +315,12 @@ public abstract class RobotConfig extends LinearOpMode {
         sleep(1000);
      
         servoOpen();
-         sleep(2000);
+        
+        sleep(2000);
     }
     
-    protected void autoArmDown() {
-        
-        armPosition = slidePulley.getCurrentPosition();
+    protected void autoArmDown() {        
         slidePulley.setTargetPosition(50);
-        //slidePulley.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         slidePulley.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         slidePulley.setPower(-0.1);
         while (slidePulley.isBusy()) {
